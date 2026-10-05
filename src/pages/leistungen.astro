@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content';
+import Seite from '../layouts/Seite.astro';
+import Maserung from '../components/Maserung.astro';
+import Icon from '../components/Icon.astro';
+import { telefonLink } from '../lib/betrieb';
+
+const leistungen = (await getCollection('leistungen')).sort((a, b) => a.data.reihenfolge - b.data.reihenfolge);
+const mitInhalt = await Promise.all(leistungen.map(async (l) => ({ ...l, Inhalt: (await render(l)).Content })));
+---
+<Seite titel="Leistungen">
+  <header class="huelle seitenkopf">
+    <p class="kicker">Was wir machen</p>
+    <h1>Leistungen</h1>
+    <p>Wir planen, bauen und montieren – sorgfältig, termintreu und mit Holz aus der Region.</p>
+  </header>
+  <div class="huelle liste">
+    {mitInhalt.map(({ id, data, Inhalt }, i) => (
+      <article class="leistung" id={id}>
+        <div class="leistung-streifen"><Maserung seed={i * 5 + 2} grund={i % 2 ? '#e2c9a2' : '#c99561'} linie={i % 2 ? '#a0703f' : '#7a4722'} ast={i % 2 === 0} /></div>
+        <div class="leistung-text">
+          <span class="leistung-nr">{String(i + 1).padStart(2, '0')}</span>
+          <h2>{data.title}</h2>
+          <p class="leistung-kurz">{data.kurz}</p>
+          <div class="prosa leistung-mehr"><Inhalt /></div>
+        </div>
+      </article>
+    ))}
+  </div>
+  <section class="huelle abschnitt cta">
+    <h2>Sie haben ein Vorhaben?</h2>
+    <p>Rufen Sie uns an – wir kommen gern vorbei und schauen es uns an.</p>
+    <a class="knopf knopf-voll" href={telefonLink}><Icon name="telefon" /> Anrufen</a>
+  </section>
+</Seite>
+
+<style>
+  .liste { display: grid; gap: 1.25rem; }
+  .leistung { display: grid; border-radius: var(--radius); overflow: hidden; background: #fffaf2; border: 1px solid var(--linie); scroll-margin-top: 5.5rem; }
+  .leistung-streifen { height: 5.5rem; }
+  .leistung-streifen :global(svg) { width: 100%; height: 100%; }
+  .leistung-text { padding: 1.4rem 1.4rem 1.6rem; }
+  .leistung-nr { font-family: var(--schrift-titel); color: var(--holz); }
+  .leistung h2 { font-size: 1.9rem; margin: 0.25rem 0 0.6rem; }
+  .leistung-kurz { font-weight: 500; font-size: 1.08rem; }
+  .leistung-mehr { margin-top: 0.75rem; color: var(--tinte-2); }
+  .cta { text-align: center; padding-top: 4rem !important; }
+  .cta h2 { font-size: clamp(2rem, 8vw, 2.8rem); }
+  .cta p { color: var(--tinte-2); margin: 0.75rem auto 1.5rem; max-width: 26rem; }
+  @media (min-width: 760px) {
+    .leistung { grid-template-columns: 14rem 1fr; }
+    .leistung-streifen { height: auto; }
+  }
+</style>

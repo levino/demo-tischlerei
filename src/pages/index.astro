@@ -1,0 +1,104 @@
+---
+import Seite from '../layouts/Seite.astro';
+import Hinweise from '../components/Hinweise.astro';
+import Leistungen from '../components/Leistungen.astro';
+import Referenzen from '../components/Referenzen.astro';
+import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
+import Maserung from '../components/Maserung.astro';
+import Icon from '../components/Icon.astro';
+import { betrieb, telefonLink } from '../lib/betrieb';
+import { url } from '../lib/url';
+
+const jahre = betrieb.gruendung ? new Date().getFullYear() - betrieb.gruendung : null;
+---
+<Seite>
+  <Hinweise />
+
+  <section class="held">
+    <div class="huelle">
+      <p class="kicker">Tischlerei in {betrieb.adresse.ort}</p>
+      <h1 class="held-titel">{betrieb.slogan ?? betrieb.name}</h1>
+      <p class="held-text">
+        Möbel nach Maß, Innenausbau, Fenster und Türen – geplant, gebaut und eingebaut von unserer Werkstatt in {betrieb.adresse.ort}.
+      </p>
+      <div class="held-knoepfe">
+        <a class="knopf knopf-voll" href={telefonLink}><Icon name="telefon" /> Anrufen</a>
+        <a class="knopf knopf-rand" href={url('leistungen/')}>Unsere Leistungen</a>
+      </div>
+    </div>
+    <div class="huelle">
+      <div class="held-flaeche">
+        <Maserung seed={11} grund="#c48d58" linie="#6e3f1f" linien={30} />
+        {jahre && (
+          <div class="held-siegel">
+            <span class="siegel-zahl">{jahre}</span>
+            <span class="siegel-text">Jahre<br />Handwerk</span>
+          </div>
+        )}
+        <p class="held-inhaber">Ihr Ansprechpartner: <strong>{betrieb.inhaber}</strong>, Tischlermeister</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="abschnitt" aria-labelledby="leistungen-titel">
+    <div class="huelle">
+      <div class="abschnitt-kopf">
+        <p class="kicker">Was wir machen</p>
+        <h2 id="leistungen-titel" class="abschnitt-titel">Leistungen</h2>
+        <p class="abschnitt-intro">Vom einzelnen Regal bis zum kompletten Innenausbau – alles aus einer Hand.</p>
+      </div>
+      <Leistungen />
+    </div>
+  </section>
+
+  <section class="abschnitt" aria-labelledby="referenzen-titel">
+    <div class="huelle">
+      <div class="abschnitt-kopf">
+        <p class="kicker">Ausgewählte Arbeiten</p>
+        <h2 id="referenzen-titel" class="abschnitt-titel">Referenzen</h2>
+      </div>
+      <Referenzen anzahl={3} />
+      <p class="mehr"><a class="textlink" href={url('referenzen/')}>Alle Referenzen ansehen <Icon name="pfeil" class="pfeil" /></a></p>
+    </div>
+  </section>
+
+  <Oeffnungszeiten />
+</Seite>
+
+<style>
+  .held { padding-top: 2.75rem; padding-bottom: 1rem; }
+  .held-titel { font-size: clamp(3.3rem, 16vw, 6.5rem); font-weight: 500; letter-spacing: -0.03em; line-height: 0.98; font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144; }
+  .held-text { margin-top: 1.25rem; font-size: 1.15rem; color: var(--tinte-2); max-width: 34rem; }
+  .held-knoepfe { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+  .held-knoepfe .knopf { flex: 1 1 auto; }
+  .held-flaeche {
+    position: relative;
+    margin-top: 2.25rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    aspect-ratio: 4 / 3.2;
+    box-shadow: 0 30px 50px -30px rgba(70, 40, 18, 0.55), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+  .held-flaeche :global(svg) { width: 100%; height: 100%; }
+  .held-flaeche::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255, 240, 215, 0.18) 0%, rgba(43, 32, 24, 0) 40%, rgba(43, 32, 24, 0.55) 100%);
+  }
+  .held-siegel {
+    position: absolute; top: 1rem; right: 1rem; z-index: 1;
+    width: 6.2rem; height: 6.2rem; border-radius: 50%;
+    background: var(--papier); color: var(--tinte);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.45);
+    transform: rotate(-8deg);
+  }
+  .siegel-zahl { font-family: var(--schrift-titel); font-size: 2.1rem; font-weight: 600; line-height: 1; }
+  .siegel-text { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.25; margin-top: 0.2rem; color: var(--holz-dunkel); }
+  .held-inhaber { position: absolute; left: 1.1rem; right: 1.1rem; bottom: 1rem; z-index: 1; color: #fff8ee; font-size: 0.95rem; }
+  .mehr { margin-top: 1.75rem; }
+  .mehr :global(.pfeil) { width: 1.1rem; height: 1.1rem; }
+  @media (min-width: 900px) {
+    .held { padding-top: 5rem; }
+    .held-flaeche { aspect-ratio: 21 / 8; }
+  }
+</style>

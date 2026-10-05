@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from 'astro:content';
+import Seite from '../layouts/Seite.astro';
+import Icon from '../components/Icon.astro';
+import { betrieb, telefonLink } from '../lib/betrieb';
+
+const jobs = await Promise.all(
+  (await getCollection('jobs', ({ data }) => data.aktiv)).map(async (j) => ({ ...j, Inhalt: (await render(j)).Content })),
+);
+---
+<Seite titel="Karriere">
+  <header class="huelle seitenkopf">
+    <p class="kicker">Arbeiten bei uns</p>
+    <h1>Karriere</h1>
+    <p>Wir sind ein kleines Team mit großer Werkstatt. Bei uns zählt gute Arbeit – und ein freundlicher Umgang.</p>
+  </header>
+  <div class="huelle unten">
+    {jobs.length === 0 && (
+      <div class="leer">
+        <h2>Gerade keine offenen Stellen</h2>
+        <p>Initiativbewerbungen freuen uns trotzdem – schreiben Sie an <a href={`mailto:${betrieb.email}`}>{betrieb.email}</a>.</p>
+      </div>
+    )}
+    <div class="stellen">
+      {jobs.map(({ id, data, Inhalt }) => (
+        <article class="stelle" id={id}>
+          <p class="stelle-art">{data.art}</p>
+          <h2>{data.title}</h2>
+          <div class="prosa stelle-text"><Inhalt /></div>
+          <div class="stelle-knoepfe">
+            <a class="knopf knopf-voll" href={`mailto:${betrieb.email}?subject=${encodeURIComponent('Bewerbung: ' + data.title)}`}><Icon name="mail" /> Jetzt bewerben</a>
+            <a class="knopf knopf-rand" href={telefonLink}><Icon name="telefon" /> Fragen? Anrufen</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</Seite>
+
+<style>
+  .unten { padding-bottom: 4rem; }
+  .stellen { display: grid; gap: 1.25rem; }
+  .stelle, .leer { background: #fffaf2; border: 1px solid var(--linie); border-radius: var(--radius); padding: 1.6rem 1.4rem; }
+  .stelle { box-shadow: inset 0 6px 0 var(--holz); padding-top: 2rem; }
+  .stelle-art { display: inline-block; font-size: 0.8rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 999px; background: var(--papier-2); color: var(--holz-dunkel); margin-bottom: 0.9rem; }
+  .stelle h2, .leer h2 { font-size: 1.9rem; margin-bottom: 1rem; }
+  .stelle-text { color: var(--tinte-2); }
+  .stelle-knoepfe { display: grid; gap: 0.75rem; margin-top: 1.5rem; }
+  @media (min-width: 640px) { .stelle-knoepfe { display: flex; } }
+</style>

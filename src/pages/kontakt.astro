@@ -1,0 +1,13 @@
+---
+import Seite from '../layouts/Seite.astro';
+import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
+import { betrieb } from '../lib/betrieb';
+---
+<Seite titel="Kontakt">
+  <header class="huelle seitenkopf">
+    <p class="kicker">Wir freuen uns auf Sie</p>
+    <h1>Kontakt</h1>
+    <p>Am schnellsten erreichen Sie uns telefonisch. Gern kommen wir zu Ihnen und schauen uns Ihr Vorhaben vor Ort an. Ihr Ansprechpartner ist {betrieb.inhaber}.</p>
+  </header>
+  <Oeffnungszeiten />
+</Seite>

@@ -1,0 +1,53 @@
+---
+// Dekorative Holzmaserung als SVG – keine Fotos nötig.
+interface Props {
+  seed?: number;
+  grund?: string;
+  linie?: string;
+  linien?: number;
+  class?: string;
+  ast?: boolean;
+}
+const { seed = 1, grund = '#c99561', linie = '#94592f', linien = 26, class: klasse, ast = true } = Astro.props;
+
+let s = seed * 9301 + 49297;
+const zufall = () => {
+  s = (s * 9301 + 49297) % 233280;
+  return s / 233280;
+};
+
+const W = 400;
+const H = 300;
+const kx = 90 + zufall() * 220;
+const ky = 70 + zufall() * 160;
+const pfade: { d: string; breite: number; deckkraft: number }[] = [];
+const abstand = H / (linien - 2);
+
+for (let i = -1; i < linien; i++) {
+  const y0 = i * abstand + zufall() * abstand * 0.5;
+  const amp = 2 + zufall() * 5;
+  const freq = 0.006 + zufall() * 0.008;
+  const phase = zufall() * Math.PI * 2;
+  const dy = y0 - ky;
+  const richtung = dy < 0 ? -1 : 1;
+  const staerke = ast ? 46 * Math.exp(-Math.abs(dy) / 70) : 0;
+  const punkte: string[] = [];
+  for (let x = -10; x <= W + 10; x += 10) {
+    const buckel = richtung * staerke * Math.exp(-((x - kx) ** 2) / (2 * 55 ** 2));
+    const y = y0 + amp * Math.sin(x * freq + phase) + buckel;
+    punkte.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+  pfade.push({ d: 'M' + punkte.join(' L'), breite: 0.8 + zufall() * 2.2, deckkraft: 0.25 + zufall() * 0.45 });
+}
+const ringe = ast ? [7, 13, 20, 28] : [];
+---
+<svg class={klasse} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <rect width={W} height={H} fill={grund} />
+  <g fill="none" stroke={linie} stroke-linecap="round">
+    {pfade.map((p) => <path d={p.d} stroke-width={p.breite} opacity={p.deckkraft} />)}
+    {ringe.map((r, i) => (
+      <ellipse cx={kx} cy={ky} rx={r * 1.9} ry={r * 0.62} stroke-width={i === 0 ? 3 : 1.4} opacity={0.55 - i * 0.08} />
+    ))}
+  </g>
+  {ast && <ellipse cx={kx} cy={ky} rx="7" ry="2.6" fill={linie} opacity="0.7" />}
+</svg>

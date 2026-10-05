@@ -1,0 +1,172 @@
+---
+import '@fontsource-variable/fraunces/full.css';
+import '@fontsource-variable/inter';
+import '../styles/global.css';
+import Logo from '../components/Logo.astro';
+import Icon from '../components/Icon.astro';
+import { url } from '../lib/url';
+import { betrieb, telefonLink } from '../lib/betrieb';
+
+interface Props { titel?: string; beschreibung?: string }
+const { titel, beschreibung = `${betrieb.name} in ${betrieb.adresse.ort} – Möbel nach Maß, Innenausbau, Fenster & Türen und Reparaturen.` } = Astro.props;
+const seitentitel = titel ? `${titel} – ${betrieb.name}` : `${betrieb.name} – ${betrieb.slogan ?? 'Tischlerei'}`;
+
+const navigation = [
+  { href: url('leistungen/'), text: 'Leistungen' },
+  { href: url('referenzen/'), text: 'Referenzen' },
+  { href: url('karriere/'), text: 'Karriere' },
+  { href: url('kontakt/'), text: 'Kontakt' },
+];
+const pfad = Astro.url.pathname.replace(/\/?$/, '/');
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f6f0e6" />
+    <meta name="robots" content="noindex" />
+    <title>{seitentitel}</title>
+    <meta name="description" content={beschreibung} />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="kopf">
+      <div class="huelle kopf-innen">
+        <a class="marke" href={url()} aria-label={`${betrieb.name} – Startseite`}>
+          <Logo class="marke-logo" />
+          <span class="marke-text">
+            <span class="marke-klein">Tischlerei</span>
+            <span class="marke-name">{betrieb.name.replace(/^Tischlerei\s+/, '')}</span>
+          </span>
+        </a>
+        <nav class="nav-breit" aria-label="Hauptnavigation">
+          {navigation.map((n) => <a href={n.href} aria-current={pfad === n.href ? 'page' : undefined}>{n.text}</a>)}
+        </nav>
+        <a class="kopf-telefon" href={telefonLink} aria-label="Anrufen"><Icon name="telefon" /></a>
+        <details class="menue">
+          <summary aria-label="Menü öffnen"><span></span><span></span></summary>
+          <nav class="menue-panel" aria-label="Hauptnavigation mobil">
+            <a href={url()} aria-current={pfad === url() ? 'page' : undefined}>Start</a>
+            {navigation.map((n) => <a href={n.href} aria-current={pfad === n.href ? 'page' : undefined}>{n.text}<Icon name="pfeil" /></a>)}
+            <a class="knopf knopf-hell" href={telefonLink}><Icon name="telefon" /> {betrieb.telefon}</a>
+          </nav>
+        </details>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="fuss">
+      <div class="huelle">
+        <div class="fuss-demo" role="note">
+          <strong>Fiktives Unternehmen – Demo-Website</strong>
+          <span>Name, Adresse und Telefonnummer sind ausgedacht. Diese Seite zeigt, wie ein Betrieb seine Website per Wunschzettel pflegen kann.</span>
+        </div>
+        <div class="fuss-raster">
+          <div>
+            <a class="marke marke-hell" href={url()}>
+              <Logo class="marke-logo" />
+              <span class="marke-text">
+                <span class="marke-klein">Tischlerei</span>
+                <span class="marke-name">{betrieb.name.replace(/^Tischlerei\s+/, '')}</span>
+              </span>
+            </a>
+            <p class="fuss-adresse">
+              {betrieb.adresse.strasse}<br />
+              {betrieb.adresse.plz} {betrieb.adresse.ort}<br />
+              <a href={telefonLink}>{betrieb.telefon}</a><br />
+              <a href={`mailto:${betrieb.email}`}>{betrieb.email}</a>
+            </p>
+          </div>
+          <nav class="fuss-nav" aria-label="Fußnavigation">
+            <a href={url()}>Start</a>
+            {navigation.map((n) => <a href={n.href}>{n.text}</a>)}
+          </nav>
+        </div>
+        <p class="fuss-zeile">© {new Date().getFullYear()} {betrieb.name} · Inhaber {betrieb.inhaber} · Fiktives Unternehmen</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .kopf {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(246, 240, 230, 0.88);
+    backdrop-filter: saturate(1.4) blur(12px);
+    -webkit-backdrop-filter: saturate(1.4) blur(12px);
+    border-bottom: 1px solid var(--linie);
+  }
+  .kopf-innen { display: flex; align-items: center; gap: 0.75rem; height: 4.25rem; }
+  .marke { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; margin-right: auto; }
+  .marke :global(.marke-logo) { width: 2.4rem; height: 2.4rem; flex: none; }
+  .marke-text { display: flex; flex-direction: column; line-height: 1; }
+  .marke-klein { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--tinte-3); }
+  .marke-name { font-family: var(--schrift-titel); font-size: 1.45rem; font-weight: 600; letter-spacing: -0.01em; margin-top: 0.15rem; }
+  .marke-hell .marke-klein { color: rgba(246, 240, 230, 0.55); }
+
+  .nav-breit { display: none; }
+  .kopf-telefon {
+    display: grid; place-items: center;
+    width: 2.75rem; height: 2.75rem; border-radius: 999px;
+    border: 1.5px solid rgba(42, 32, 25, 0.18); color: var(--tinte);
+  }
+  .kopf-telefon :global(svg) { width: 1.15rem; height: 1.15rem; }
+
+  .menue summary {
+    list-style: none; cursor: pointer;
+    width: 2.75rem; height: 2.75rem; border-radius: 999px;
+    background: var(--tinte);
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+  }
+  .menue summary::-webkit-details-marker { display: none; }
+  .menue summary span { display: block; width: 1.1rem; height: 2px; border-radius: 2px; background: var(--papier); transition: transform 0.2s ease; }
+  .menue[open] summary span:first-child { transform: translateY(3.5px) rotate(45deg); }
+  .menue[open] summary span:last-child { transform: translateY(-3.5px) rotate(-45deg); }
+  .menue-panel {
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--papier);
+    border-bottom: 1px solid var(--linie);
+    box-shadow: 0 30px 40px -20px rgba(42, 32, 25, 0.25);
+    padding: 0.5rem var(--rand) 1.5rem;
+    display: flex; flex-direction: column;
+  }
+  .menue-panel a:not(.knopf) {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 0; border-bottom: 1px solid var(--linie);
+    font-family: var(--schrift-titel); font-size: 1.6rem; text-decoration: none;
+  }
+  .menue-panel a :global(svg) { width: 1.3rem; color: var(--holz); }
+  .menue-panel a[aria-current='page'] { color: var(--holz); }
+  .menue-panel .knopf { margin-top: 1.5rem; }
+
+  @media (min-width: 860px) {
+    .menue { display: none; }
+    .nav-breit { display: flex; gap: 2rem; margin-right: 1rem; }
+    .nav-breit a { text-decoration: none; font-weight: 500; color: var(--tinte-2); }
+    .nav-breit a:hover, .nav-breit a[aria-current='page'] { color: var(--tinte); }
+  }
+
+  .fuss { background: var(--espresso); color: rgba(246, 240, 230, 0.8); padding: 3rem 0 2rem; margin-top: 0; }
+  .fuss-demo {
+    display: flex; flex-direction: column; gap: 0.3rem;
+    padding: 1.1rem 1.25rem; border-radius: 1rem;
+    border: 1.5px dashed rgba(227, 166, 76, 0.55);
+    background: rgba(227, 166, 76, 0.08);
+    font-size: 0.92rem; line-height: 1.5; margin-bottom: 2.5rem;
+  }
+  .fuss-demo strong { color: var(--honig); font-size: 1rem; letter-spacing: 0.01em; }
+  .fuss-raster { display: grid; gap: 2rem; }
+  .fuss .marke-name { color: var(--papier); }
+  .fuss-adresse { margin-top: 1.25rem; line-height: 1.75; }
+  .fuss-adresse a { text-decoration: none; }
+  .fuss-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1rem; }
+  .fuss-nav a { text-decoration: none; color: var(--papier); }
+  .fuss-zeile { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(246, 240, 230, 0.12); font-size: 0.82rem; color: rgba(246, 240, 230, 0.5); }
+  @media (min-width: 760px) { .fuss-raster { grid-template-columns: 2fr 1fr; } }
+</style>

@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import Maserung from './Maserung.astro';
+
+interface Props { anzahl?: number; ausfuehrlich?: boolean }
+const { anzahl, ausfuehrlich = false } = Astro.props;
+const alle = (await getCollection('referenzen')).sort((a, b) => b.data.jahr - a.data.jahr);
+const referenzen = anzahl ? alle.slice(0, anzahl) : alle;
+const toene = [
+  { grund: '#c99561', linie: '#7a4722' },
+  { grund: '#e2c9a2', linie: '#a0703f' },
+  { grund: '#7a4b2b', linie: '#3b2213' },
+  { grund: '#b98b5c', linie: '#5e3a1d' },
+];
+---
+<ul class="referenzen">
+  {referenzen.map((r, i) => (
+    <li class="referenz" id={r.id}>
+      <div class="referenz-bild">
+        <Maserung seed={i * 7 + 3} grund={toene[i % toene.length].grund} linie={toene[i % toene.length].linie} />
+        <span class="referenz-jahr">{r.data.jahr}</span>
+      </div>
+      <div class="referenz-text">
+        <p class="referenz-ort">{r.data.ort}</p>
+        <h3>{r.data.title}</h3>
+        <p>{r.data.kurz}</p>
+        {ausfuehrlich && r.body && <p class="referenz-mehr">{r.body.trim()}</p>}
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .referenzen { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; }
+  .referenz { border-radius: var(--radius); overflow: hidden; background: #fffaf2; border: 1px solid var(--linie); }
+  .referenz-bild { position: relative; aspect-ratio: 16 / 10; }
+  .referenz-bild :global(svg) { width: 100%; height: 100%; }
+  .referenz-jahr {
+    position: absolute; left: 1rem; bottom: 1rem;
+    padding: 0.3rem 0.75rem; border-radius: 999px;
+    background: rgba(246, 240, 230, 0.92); color: var(--tinte);
+    font-size: 0.82rem; font-weight: 600;
+  }
+  .referenz-text { padding: 1.25rem 1.4rem 1.5rem; }
+  .referenz-ort { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--holz); margin-bottom: 0.4rem; }
+  .referenz h3 { font-size: 1.45rem; margin-bottom: 0.5rem; }
+  .referenz p:not(.referenz-ort) { color: var(--tinte-2); font-size: 0.98rem; }
+  .referenz-mehr { margin-top: 0.75rem; }
+  @media (min-width: 760px) { .referenzen { grid-template-columns: repeat(3, 1fr); } }
+</style>

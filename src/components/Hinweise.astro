@@ -1,0 +1,87 @@
+---
+import { render } from 'astro:content';
+import Icon from './Icon.astro';
+import { aktuelleHinweise, datumDeutsch } from '../lib/hinweise';
+
+const hinweise = await aktuelleHinweise();
+const eintraege = await Promise.all(
+  hinweise.map(async (h) => ({ ...h, Inhalt: h.body?.trim() ? (await render(h)).Content : null })),
+);
+
+function zeitraum(von?: Date, bis?: Date) {
+  if (von && bis) {
+    const gleichesJahr = von.getUTCFullYear() === bis.getUTCFullYear();
+    return `${datumDeutsch(von, !gleichesJahr)} bis ${datumDeutsch(bis)}`;
+  }
+  if (bis) return `bis ${datumDeutsch(bis)}`;
+  if (von) return `ab ${datumDeutsch(von)}`;
+  return null;
+}
+---
+{eintraege.length > 0 && (
+  <div class="hinweise">
+    {eintraege.map(({ data, Inhalt }) => (
+      <section class="hinweis" data-demo="hinweis" aria-label="Aktueller Hinweis">
+        <div class="huelle hinweis-innen">
+          <p class="hinweis-label">
+            <span class="hinweis-punkt" aria-hidden="true"></span>
+            Aktueller Hinweis
+          </p>
+          <h2 class="hinweis-titel">{data.title}</h2>
+          {data.text && <p class="hinweis-text">{data.text}</p>}
+          {zeitraum(data.von, data.bis) && <p class="hinweis-zeit"><Icon name="uhr" /> {zeitraum(data.von, data.bis)}</p>}
+          {Inhalt && <div class="hinweis-text prosa"><Inhalt /></div>}
+        </div>
+      </section>
+    ))}
+  </div>
+)}
+
+<style>
+  .hinweis {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(227, 166, 76, 0.35) 0%, rgba(227, 166, 76, 0) 55%),
+      linear-gradient(160deg, #3a2a1d 0%, #2b2018 100%);
+    color: var(--papier);
+    border-bottom: 4px solid var(--honig);
+    animation: hinweis-rein 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .hinweis::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-8deg, rgba(255, 255, 255, 0) 0 9px, rgba(255, 255, 255, 0.025) 9px 11px);
+    pointer-events: none;
+  }
+  .hinweis + .hinweis { border-top: 1px solid rgba(246, 240, 230, 0.1); }
+  .hinweis-innen { position: relative; z-index: 1; padding-block: 1.6rem 1.75rem; }
+  .hinweis-label {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem;
+    font-size: 0.74rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--honig);
+    margin-bottom: 0.7rem;
+  }
+  .hinweis-zeit {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    margin-top: 1rem; padding: 0.4rem 0.85rem 0.4rem 0.7rem; border-radius: 999px;
+    background: rgba(227, 166, 76, 0.16); border: 1px solid rgba(227, 166, 76, 0.4);
+    font-size: 0.88rem; font-weight: 600; color: #f6dcb0;
+  }
+  .hinweis-zeit :global(svg) { width: 1rem; height: 1rem; color: var(--honig); }
+  .hinweis-punkt {
+    position: relative; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--honig);
+    margin-right: 0.15rem;
+  }
+  .hinweis-punkt::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--honig);
+    animation: puls 1.8s ease-out infinite;
+  }
+  .hinweis-titel { font-size: clamp(1.75rem, 7.5vw, 2.6rem); color: #fff8ee; }
+  .hinweis-text { margin-top: 0.6rem; font-size: 1.05rem; line-height: 1.55; color: rgba(246, 240, 230, 0.86); max-width: 40rem; }
+  .hinweis-text :global(a) { color: var(--honig); }
+  @keyframes puls { from { transform: scale(1); opacity: 0.7; } to { transform: scale(2.8); opacity: 0; } }
+  @keyframes hinweis-rein { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .hinweis, .hinweis-punkt::after { animation: none; } }
+</style>

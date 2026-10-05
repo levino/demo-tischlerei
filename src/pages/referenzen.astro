@@ -1,0 +1,15 @@
+---
+import Seite from '../layouts/Seite.astro';
+import Referenzen from '../components/Referenzen.astro';
+---
+<Seite titel="Referenzen">
+  <header class="huelle seitenkopf">
+    <p class="kicker">Ausgewählte Arbeiten</p>
+    <h1>Referenzen</h1>
+    <p>Ein kleiner Einblick in Projekte, die wir für unsere Kundinnen und Kunden umgesetzt haben.</p>
+  </header>
+  <div class="huelle unten">
+    <Referenzen ausfuehrlich />
+  </div>
+</Seite>
+<style>.unten { padding-bottom: 4rem; }</style>

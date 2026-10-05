@@ -1,0 +1,17 @@
+name: Tischlerei Nordholz
+inhaber: Jonas Nordholz
+slogan: Holz, das bleibt.
+gruendung: 1987
+adresse:
+  strasse: Werkstraße 12
+  plz: "31000"
+  ort: Lindenau
+telefon: 0000 123456
+email: info@example.com
+oeffnungszeiten:
+  - tage: Montag bis Donnerstag
+    zeit: 7:00 – 16:30 Uhr
+  - tage: Freitag
+    zeit: 7:00 – 13:00 Uhr
+  - tage: Samstag
+    zeit: nach Vereinbarung
