@@ -71,6 +71,14 @@
         "dockerfile"
       ],
       "pinDigests": true
+    },
+    {
+      "description": "Astro und alle @astrojs/*-Pakete gemeinsam aktualisieren: Adapter und Integrationen haben Peer-Abhängigkeiten auf die Astro-Hauptversion, getrennte PRs scheitern am Lockfile.",
+      "matchPackageNames": [
+        "astro",
+        "@astrojs/**"
+      ],
+      "groupName": "astro"
     }
   ]
 }
